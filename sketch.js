@@ -1,7 +1,7 @@
 // ------------------------------------------------------
 // HAIR CROWN
-// interactive audience poem
-// whole-line curl version
+// vertical ponytail strand version
+// whole-strand arc curl
 // p5.js 2.x
 // ------------------------------------------------------
 
@@ -10,53 +10,35 @@
 // FONT
 // ------------------------------------------------------
 
-const FONT_NAME = "Syne";
+const FONT_NAME = "Lora";
 
 
 // ------------------------------------------------------
-// INITIAL POEM
+// STRANDS
 // ------------------------------------------------------
 
-const INITIAL_LINES = [
-  "Baking sourdough when we are sad",
-  "Making micro bangs when we are sad",
-  "Saving menstrual blood when we are sad",
-  "Not calling friends when we are sad",
-  "Ordering from amazon when we are sad",
-  "Fitting body into this dollhouse when we are sad",
-  "Eating weights when we are sad",
-  "Stripping the plastic from metal playground when we are sad",
-  "Big feelings when we have a sweet tooth",
-  "Pulling out hair when we are sad",
-  "Sad when we need to sleep",
-  "Sleep when we need to read for school",
-  "Each carpet holds her dust until I clean them",
-  "We are sad",
-  "Coquet hook and a nibble of the loop not moving in the correct way when we are sad",
-  "Screaming until lungs come up sad",
-  "Collecting gemstones when we are sad",
-  "Lipping a cappuccino when we are sad",
-  "Going home to bathtub when we are sad",
-  "Making a crown own of hair when we are sad",
-  "An empty wallet when we are sad",
-  "No sex when we are sad",
-  "Blowing candles off birthday cake when we are sad",
-  "A lot of sex when we are sad",
-  "Sad when we are sad",
-  "Iron torch to the throat sad",
-  "Bus driver smiles when we are sad",
-  "Slaying when we are sad",
-  "Forage golden rod when we are sad",
-  "Driving to Boston when we are sad",
-  "The british are coming! The british are coming! When we are sad",
-  "Spilt tea on jeans when we are sad",
-  "Chinese lantern fly assault to torso when we are sad",
-  "Two men call out hey sexy come here when we are sad",
-  "Croatian sea shell noise when we are sad",
-  "Mustard ice cubes on sandwiches when we are sad",
-  "Cats smell of fresh bread when we are sad",
-  "Using a grinder at the steele yard when we are sad",
-  "Don’t text her back when we are sad"
+const INITIAL_STRANDS = [
+
+  "Baking sourdough when we are sad ( Making micro bangs when we are sad ) Saving menstrual blood when we are sad ( Not calling friends when we are sad",
+
+  "Ordering from amazon when we are sad ) Fitting body into this dollhouse when we are sad } Eating weights when we are sad ( Stripping the plastic from metal playground when we are sad",
+
+  "Big feelings when we have a sweet tooth ( Pulling out hair when we are sad ) Sad when we need to sleep ( Sleep when we need to read for school",
+
+  "Each carpet holds her dust until I clean them ) We are sad ( Screaming until lungs come up sad ) Collecting gemstones when we are sad",
+
+  "Lipping a cappuccino when we are sad ( Going home to bathtub when we are sad ( Making a crown own of hair when we are sad ) An empty wallet when we are sad",
+
+  "No sex when we are sad ) Blowing candles off birthday cake when we are sad ( A lot of sex when we are sad ) Sad when we are sad",
+
+  "Iron torch to the throat sad ( Bus driver smiles when we are sad ( Slaying when we are sad ) Forage golden rod when we are sad ( Driving to Boston when we are sad",
+
+  "The british are coming! The british are coming! When we are sad ) Spilt tea on jeans when we are sad ( Chinese lantern fly assault to torso when we are sad",
+
+  "Two men call out hey sexy come here when we are sad ) Croatian sea shell noise when we are sad ( Mustard ice cubes on sandwiches when we are sad",
+
+  "Cats smell of fresh bread when we are sad ) Using a grinder at the steel yard when we are sad } Don’t text her back when we are sad"
+
 ];
 
 
@@ -64,15 +46,87 @@ const INITIAL_LINES = [
 // TYPOGRAPHY
 // ------------------------------------------------------
 
-const FONT_SIZE = 21;
+const FONT_SIZE = 18;
 
 const LETTER_SPACING_RATIO = 0.06;
-const WORD_SPACING_EXTRA = 5;
+const WORD_SPACING_EXTRA = 6;
 
-const LINE_STEP = 42;
+const VERTICAL_SPACING_SCALE = 1;
 
-const MARGIN_X = 90;
-const TOP_MARGIN = 115;
+
+// ------------------------------------------------------
+// CANVAS
+// ------------------------------------------------------
+
+const CANVAS_HEIGHT = 1900;
+
+
+// ------------------------------------------------------
+// PONYTAIL LAYOUT
+// ------------------------------------------------------
+
+const ROOT_Y = 75;
+
+const ROOT_SPREAD = 180;
+
+const FAN_SPREAD = 500;
+
+const FAN_POWER = 2;
+
+
+// ------------------------------------------------------
+// TITLE
+// ------------------------------------------------------
+
+// Allows a final tiny optical correction if needed.
+// Try +/- 5 or 10 later if Ashlee wants it shifted.
+const TITLE_OPTICAL_OFFSET_X = 0;
+
+
+// ------------------------------------------------------
+// WIND
+// ------------------------------------------------------
+
+const WIND_X = 24;
+
+const GUST_X = 14;
+
+const RIPPLE_X = 8;
+
+const RIPPLE_Y = 3;
+
+const ANCHOR_POWER = 1.8;
+
+
+// ------------------------------------------------------
+// GROWTH CYCLE
+// ------------------------------------------------------
+
+const GROW_DURATION = 40000;
+
+const HOLD_DURATION = 20000;
+
+const RESET_PAUSE = 1200;
+
+let cycleStartTime = 0;
+
+
+// ------------------------------------------------------
+// HOVER / WHOLE-STRAND CURL
+// ------------------------------------------------------
+
+const HOVER_DELAY = 400;
+
+
+// The entire strand bends into a circular arc.
+//
+// PI = 180°
+// 1.25 PI = 225°
+//
+// This is intentionally dramatic.
+
+const CURL_ANGLE_MIN = Math.PI * 0.90;
+const CURL_ANGLE_MAX = Math.PI * 1.30;
 
 
 // ------------------------------------------------------
@@ -81,8 +135,8 @@ const TOP_MARGIN = 115;
 
 const MAX_CHARACTERS = 100;
 
-const INPUT_HEIGHT = 86;
-const INPUT_MARGIN_TOP = 55;
+const INPUT_WIDTH = 500;
+const INPUT_HEIGHT = 82;
 
 let currentInput = "";
 let inputActive = false;
@@ -94,32 +148,11 @@ const CURSOR_BLINK_SPEED = 500;
 
 
 // ------------------------------------------------------
-// NORMAL HAIR MOTION
-// ------------------------------------------------------
-
-const WIND_X = 7;
-const WIND_Y = 3;
-
-const WAVE_X = 3;
-const WAVE_Y = 5;
-
-// stronger left-side anchor
-const ANCHOR_POWER = 2.5;
-
-
-// ------------------------------------------------------
-// HOVER / CURL
-// ------------------------------------------------------
-
-// 0.5 seconds
-const HOVER_DELAY = 500;
-
-
-// ------------------------------------------------------
 // DATA
 // ------------------------------------------------------
 
-let poemLines = [];
+let strands = [];
+
 let layoutReady = false;
 
 
@@ -131,41 +164,68 @@ function setup() {
 
   createCanvas(
     windowWidth,
-    2600
+    CANVAS_HEIGHT
   );
 
-  textAlign(LEFT, TOP);
+  textAlign(
+    LEFT,
+    TOP
+  );
+
 
   document.fonts.ready.then(() => {
 
-    textFont(FONT_NAME);
+    textFont(
+      FONT_NAME
+    );
 
-    INITIAL_LINES.forEach(
-      txt => {
-        poemLines.push(
-          createPoemLine(txt)
+
+    INITIAL_STRANDS.forEach(
+      (txt, index) => {
+
+        strands.push(
+          createStrand(
+            txt,
+            index
+          )
         );
+
       }
     );
 
-    updateCanvasHeight();
 
-    layoutReady = true;
+    cycleStartTime =
+      millis();
+
+
+    layoutReady =
+      true;
   });
 }
 
 
 // ------------------------------------------------------
-// CREATE A LINE / STRAND
+// CREATE STRAND
 // ------------------------------------------------------
 
-function createPoemLine(txt) {
+function createStrand(
+  txt,
+  index
+) {
 
-  textSize(FONT_SIZE);
-  textStyle(NORMAL);
+  textSize(
+    FONT_SIZE
+  );
+
+  textStyle(
+    NORMAL
+  );
+
 
   let glyphs = [];
-  let x = 0;
+
+  let distance =
+    0;
 
 
   Array.from(txt).forEach(
@@ -177,41 +237,114 @@ function createPoemLine(txt) {
 
       glyphs.push({
 
-        char: ch,
+        char:
+          ch,
 
-        offsetX: x,
+        offsetY:
+          distance,
 
-        width: w
+        width:
+          w
+
       });
 
 
-      if (ch === " ") {
+      let advance;
 
-        x +=
+
+      if (
+        ch === " "
+      ) {
+
+        advance =
+
           w +
+
           WORD_SPACING_EXTRA;
 
       } else {
 
-        x +=
+        advance =
+
           w +
+
           w *
           LETTER_SPACING_RATIO;
       }
+
+
+      distance +=
+
+        advance *
+
+        VERTICAL_SPACING_SCALE;
+
     }
   );
 
 
+  let normalizedIndex =
+
+    INITIAL_STRANDS.length <= 1
+
+      ? 0
+
+      : map(
+          index,
+          0,
+          INITIAL_STRANDS.length - 1,
+          -1,
+          1
+        );
+
+
   return {
 
-    text: txt,
+    text:
+      txt,
 
-    glyphs: glyphs,
+    glyphs:
+      glyphs,
 
-    width: x,
+    length:
+      distance,
+
+
+    // ------------------------------------------
+    // ROOT
+    // ------------------------------------------
+
+    rootOffset:
+
+      normalizedIndex *
+
+      ROOT_SPREAD *
+      0.5,
+
+
+    // ------------------------------------------
+    // FAN
+    // ------------------------------------------
+
+    fanOffset:
+
+      normalizedIndex *
+
+      FAN_SPREAD *
+      0.5,
+
+
+    // ------------------------------------------
+    // WIND
+    // ------------------------------------------
 
     phase:
       random(TWO_PI),
+
+
+    // ------------------------------------------
+    // HOVER
+    // ------------------------------------------
 
     hoverStart:
       null,
@@ -219,51 +352,25 @@ function createPoemLine(txt) {
     curlAmount:
       0,
 
-    // -1 = up
-    // +1 = down
+
+    // left or right
     curlDirection:
+
       random() < 0.5
+
         ? -1
+
         : 1,
 
-    // roughly one circular curl
-    curlLoops:
-      random(
-        0.82,
-        1.02
-      ),
 
-    // overall curl size
-    curlRadius:
+    // slightly different curvature per interaction
+    curlAngle:
+
       random(
-        55,
-        85
+        CURL_ANGLE_MIN,
+        CURL_ANGLE_MAX
       )
   };
-}
-
-
-// ------------------------------------------------------
-// SMOOTH CURVE HELPER
-// ------------------------------------------------------
-
-function smoothStep01(v) {
-
-  v =
-    constrain(
-      v,
-      0,
-      1
-    );
-
-  return (
-    v *
-    v *
-    (
-      3 -
-      2 * v
-    )
-  );
 }
 
 
@@ -280,20 +387,125 @@ function draw() {
   );
 
 
-  if (!layoutReady) {
+  if (
+    !layoutReady
+  ) {
+
     return;
   }
 
 
+  let cycleState =
+    getCycleState();
+
+
   drawTitle();
 
-  updateHoverStates();
+  updateHoverStates(
+    cycleState.growth
+  );
 
-  drawPoem();
+  drawStrands(
+    cycleState
+  );
 
   drawInputBox();
 
   updateCursor();
+}
+
+
+// ------------------------------------------------------
+// VISUAL CENTER OF STRAND CLUSTER
+// ------------------------------------------------------
+//
+// Instead of using width / 2,
+// estimate the center of the ACTUAL text mass.
+//
+// Longer strands contribute more visual weight.
+// Fan direction is also included.
+//
+// ------------------------------------------------------
+
+function getStrandVisualCenterX() {
+
+  if (
+    strands.length === 0
+  ) {
+
+    return width * 0.5;
+  }
+
+
+  let weightedX =
+    0;
+
+  let totalWeight =
+    0;
+
+
+  strands.forEach(
+    strand => {
+
+      // Average of pow(t, FAN_POWER)
+      // from t = 0 → 1
+      //
+      // = 1 / (FAN_POWER + 1)
+
+      let averageFan =
+
+        strand.fanOffset /
+
+        (
+          FAN_POWER +
+          1
+        );
+
+
+      let strandCenterX =
+
+        getRootX(
+          strand
+        )
+
+        +
+
+        averageFan;
+
+
+      // Longer strand = more visual mass
+
+      let weight =
+
+        max(
+          strand.length,
+          1
+        );
+
+
+      weightedX +=
+
+        strandCenterX *
+
+        weight;
+
+
+      totalWeight +=
+        weight;
+    }
+  );
+
+
+  return (
+
+    weightedX /
+
+    totalWeight
+
+    +
+
+    TITLE_OPTICAL_OFFSET_X
+  );
 }
 
 
@@ -303,317 +515,714 @@ function draw() {
 
 function drawTitle() {
 
-  textFont(FONT_NAME);
+  textFont(
+    FONT_NAME
+  );
 
-  textStyle(NORMAL);
+  textStyle(
+    NORMAL
+  );
 
-  textSize(34);
+  textSize(
+    30
+  );
 
   fill(20);
 
   noStroke();
 
 
+  textAlign(
+    CENTER,
+    TOP
+  );
+
+
   text(
-    "Hair Crown",
-    MARGIN_X,
-    52
+    "HAIR CROWN",
+
+    getStrandVisualCenterX(),
+
+    ROOT_Y - 38
+  );
+
+
+  textAlign(
+    LEFT,
+    TOP
   );
 }
 
 
 // ------------------------------------------------------
-// LINE Y POSITION
+// CYCLE STATE
 // ------------------------------------------------------
 
-function getLineY(index) {
+function getCycleState() {
+
+  let cycleLength =
+
+    GROW_DURATION +
+
+    HOLD_DURATION +
+
+    RESET_PAUSE;
+
+
+  let elapsed =
+
+    (
+      millis() -
+      cycleStartTime
+    )
+
+    %
+
+    cycleLength;
+
+
+  // ------------------------------------------
+  // GROW
+  // ------------------------------------------
+
+  if (
+    elapsed <
+    GROW_DURATION
+  ) {
+
+    return {
+
+      growth:
+
+        constrain(
+
+          elapsed /
+          GROW_DURATION,
+
+          0,
+
+          1
+        ),
+
+      holding:
+        false,
+
+      resetting:
+        false
+    };
+  }
+
+
+  // ------------------------------------------
+  // HOLD
+  // ------------------------------------------
+
+  if (
+    elapsed <
+    GROW_DURATION +
+    HOLD_DURATION
+  ) {
+
+    return {
+
+      growth:
+        1,
+
+      holding:
+        true,
+
+      resetting:
+        false
+    };
+  }
+
+
+  // ------------------------------------------
+  // RESET
+  // ------------------------------------------
+
+  return {
+
+    growth:
+      0,
+
+    holding:
+      false,
+
+    resetting:
+      true
+  };
+}
+
+
+// ------------------------------------------------------
+// ROOT X
+// ------------------------------------------------------
+
+function getRootX(
+  strand
+) {
 
   return (
-    TOP_MARGIN +
-    index *
-    LINE_STEP
+
+    width *
+    0.5
+
+    +
+
+    strand.rootOffset
   );
 }
 
 
 // ------------------------------------------------------
-// DRAW POEM
+// BASE GLYPH POSITION
 // ------------------------------------------------------
 
-function drawPoem() {
+function getBaseGlyphPosition(
+  strand,
+  glyphIndex,
+  time
+) {
+
+  let glyph =
+
+    strand.glyphs[
+      glyphIndex
+    ];
+
+
+  let glyphCount =
+
+    strand.glyphs.length;
+
+
+  let strandPos =
+
+    glyphCount <= 1
+
+      ? 0
+
+      : glyphIndex /
+        (
+          glyphCount -
+          1
+        );
+
+
+  // ------------------------------------------
+  // ANCHOR
+  // ------------------------------------------
+
+  let anchorFactor =
+
+    pow(
+      strandPos,
+      ANCHOR_POWER
+    );
+
+
+  // ------------------------------------------
+  // PONYTAIL FAN
+  // ------------------------------------------
+
+  let fanAmount =
+
+    pow(
+      strandPos,
+      FAN_POWER
+    );
+
+
+  let ponytailX =
+
+    strand.fanOffset *
+
+    fanAmount;
+
+
+  // ------------------------------------------
+  // WIND
+  // ------------------------------------------
+
+  let windX =
+
+    (
+      sin(
+
+        time *
+        0.42
+
+        +
+
+        strand.phase
+
+        +
+
+        strandPos *
+        2.2
+
+      )
+
+      *
+
+      WIND_X
+
+
+      +
+
+
+      sin(
+
+        time *
+        0.16
+
+        +
+
+        strand.phase *
+        1.8
+
+      )
+
+      *
+
+      GUST_X
+    )
+
+    *
+
+    anchorFactor;
+
+
+  // ------------------------------------------
+  // RIPPLE
+  // ------------------------------------------
+
+  let rippleX =
+
+    sin(
+
+      strandPos *
+      10
+
+      -
+
+      time *
+      0.9
+
+      +
+
+      strand.phase
+
+    )
+
+    *
+
+    RIPPLE_X
+
+    *
+
+    anchorFactor;
+
+
+  let rippleY =
+
+    cos(
+
+      strandPos *
+      7
+
+      -
+
+      time *
+      0.75
+
+      +
+
+      strand.phase
+
+    )
+
+    *
+
+    RIPPLE_Y
+
+    *
+
+    anchorFactor;
+
+
+  return {
+
+    x:
+
+      getRootX(
+        strand
+      )
+
+      +
+
+      ponytailX
+
+      +
+
+      windX
+
+      +
+
+      rippleX,
+
+
+    y:
+
+      ROOT_Y
+
+      +
+
+      glyph.offsetY
+
+      +
+
+      rippleY
+  };
+}
+
+
+// ------------------------------------------------------
+// WHOLE-STRAND ARC CURL
+// ------------------------------------------------------
+//
+// This is the important new behavior.
+//
+// Instead of adding a random offset to each glyph,
+// the entire text strand is mapped onto one circular arc.
+//
+// Because:
+//
+// radius * angle = arc length
+//
+// the distance along the path stays proportional
+// to the original text spacing.
+//
+// ------------------------------------------------------
+
+function getCurlOffset(
+  strand,
+  glyph,
+  visibleLength
+) {
+
+  if (
+    strand.curlAmount <
+    0.0001
+  ) {
+
+    return {
+      x: 0,
+      y: 0
+    };
+  }
+
+
+  let distanceAlongStrand =
+
+    glyph.offsetY;
+
+
+  visibleLength =
+
+    max(
+      visibleLength,
+      1
+    );
+
+
+  let fullAngle =
+
+    strand.curlAngle *
+
+    strand.curlAmount;
+
+
+  let absAngle =
+
+    abs(
+      fullAngle
+    );
+
+
+  if (
+    absAngle <
+    0.001
+  ) {
+
+    return {
+      x: 0,
+      y: 0
+    };
+  }
+
+
+  // Radius chosen so total visible strand length
+  // corresponds to the desired total arc angle.
+
+  let radius =
+
+    visibleLength /
+
+    absAngle;
+
+
+  // Arc angle for this glyph
+
+  let theta =
+
+    (
+      distanceAlongStrand /
+      visibleLength
+    )
+
+    *
+
+    absAngle;
+
+
+  theta =
+
+    constrain(
+      theta,
+      0,
+      absAngle
+    );
+
+
+  // Circular arc beginning vertically downward.
+
+  let arcX =
+
+    strand.curlDirection
+
+    *
+
+    radius
+
+    *
+
+    (
+      1 -
+      cos(theta)
+    );
+
+
+  let arcY =
+
+    radius *
+
+    sin(theta);
+
+
+  // Original straight position was:
+  //
+  // x = 0
+  // y = distanceAlongStrand
+  //
+  // Return only the DIFFERENCE.
+
+  return {
+
+    x:
+      arcX,
+
+    y:
+
+      arcY -
+
+      distanceAlongStrand
+  };
+}
+
+
+// ------------------------------------------------------
+// DRAW STRANDS
+// ------------------------------------------------------
+
+function drawStrands(
+  cycleState
+) {
+
+  let growth =
+
+    cycleState.growth;
+
 
   let t =
+
     millis() *
     0.001;
 
 
-  poemLines.forEach(
-    (lineObj, lineIndex) => {
-
-      let baseY =
-        getLineY(lineIndex);
-
+  strands.forEach(
+    strand => {
 
       let glyphCount =
-        lineObj.glyphs.length;
+
+        strand.glyphs.length;
 
 
-      lineObj.glyphs.forEach(
+      // Visible physical length of this strand
+
+      let visibleLength =
+
+        strand.length *
+
+        growth;
+
+
+      strand.glyphs.forEach(
         (glyph, glyphIndex) => {
 
-          let linePos =
+          let glyphProgress =
 
             glyphCount <= 1
 
               ? 0
 
               : glyphIndex /
-                (glyphCount - 1);
+                (
+                  glyphCount -
+                  1
+                );
 
 
           // ------------------------------------------
-          // LEFT-SIDE ANCHOR
+          // NOT YET GROWN
           // ------------------------------------------
 
-          let anchorFactor =
+          if (
+            glyphProgress >
+            growth
+          ) {
 
-            pow(
-              linePos,
-              ANCHOR_POWER
+            return;
+          }
+
+
+          let basePosition =
+
+            getBaseGlyphPosition(
+
+              strand,
+
+              glyphIndex,
+
+              t
             );
 
 
           // ------------------------------------------
-          // NORMAL WIND
+          // OPACITY
           // ------------------------------------------
 
-          let windX =
-
-            (
-              sin(
-                t * 0.37 +
-                lineObj.phase
-              ) *
-              WIND_X
-
-              +
-
-              sin(
-                t * 0.17 +
-                lineObj.phase * 1.8
-              ) *
-              WIND_X *
-              0.55
-            )
-
-            *
-
-            anchorFactor;
+          let opacity;
 
 
-          let windY =
+          // IMPORTANT:
+          //
+          // Once fully grown,
+          // force EVERY glyph to full opacity.
+          //
+          // This fixes the last few characters
+          // staying pale/incomplete.
 
-            (
-              cos(
-                t * 0.32 +
-                lineObj.phase
-              ) *
-              WIND_Y
+          if (
+            growth >= 0.999
+          ) {
 
-              +
+            opacity =
+              255;
 
-              sin(
-                t * 0.14 +
-                lineObj.phase * 1.3
-              ) *
-              WIND_Y *
-              0.5
-            )
+          } else {
 
-            *
+            let distanceBehindTip =
 
-            anchorFactor;
-
-
-          // ------------------------------------------
-          // SMALL TRAVELING WAVE
-          // ------------------------------------------
-
-          let waveX =
-
-            sin(
-
-              linePos * 7
-
-              -
-
-              t * 0.8
-
-              +
-
-              lineObj.phase
-
-            )
-
-            *
-
-            WAVE_X
-
-            *
-
-            anchorFactor;
+              growth -
+              glyphProgress;
 
 
-          let waveY =
+            opacity =
 
-            cos(
+              constrain(
 
-              linePos * 6
+                map(
 
-              -
+                  distanceBehindTip,
 
-              t * 0.7
+                  0,
+                  0.025,
 
-              +
+                  0,
+                  255
 
-              lineObj.phase
+                ),
 
-            )
-
-            *
-
-            WAVE_Y
-
-            *
-
-            anchorFactor;
+                0,
+                255
+              );
+          }
 
 
           // ------------------------------------------
-          // WHOLE-LINE CIRCULAR CURL
+          // WHOLE-STRAND CURL
           // ------------------------------------------
 
-          // Entire line participates,
-          // but the deformation increases
-          // gradually from left to right.
+          let curl =
 
-          let curlProgress =
+            getCurlOffset(
 
-            pow(
-              linePos,
-              1.25
+              strand,
+
+              glyph,
+
+              visibleLength
             );
 
-
-          curlProgress =
-            smoothStep01(
-              curlProgress
-            );
-
-
-          // One circular loop
-          let theta =
-
-            curlProgress
-
-            *
-
-            TWO_PI
-
-            *
-
-            lineObj.curlLoops;
-
-
-          // Radius grows from zero at the anchored end.
-          // This is what makes the whole line act
-          // like one connected flexible string.
-
-          let radius =
-
-            lineObj.curlRadius
-
-            *
-
-            curlProgress
-
-            *
-
-            lineObj.curlAmount;
-
-
-          // Horizontal circular deformation
-          let curlX =
-
-            -radius
-
-            *
-
-            (
-              1 -
-              cos(theta)
-            );
-
-
-          // Vertical circular deformation
-          let curlY =
-
-            lineObj.curlDirection
-
-            *
-
-            radius
-
-            *
-
-            sin(theta);
-
-
-          // ------------------------------------------
-          // FINAL POSITION
-          // ------------------------------------------
 
           let x =
 
-            MARGIN_X
+            basePosition.x
 
             +
 
-            glyph.offsetX
-
-            +
-
-            windX
-
-            +
-
-            waveX
-
-            +
-
-            curlX;
+            curl.x;
 
 
           let y =
 
-            baseY
+            basePosition.y
 
             +
 
-            windY
-
-            +
-
-            waveY
-
-            +
-
-            curlY;
+            curl.y;
 
 
           // ------------------------------------------
-          // DRAW
+          // DRAW GLYPH
           // ------------------------------------------
+
+          push();
+
+
+          translate(
+            x,
+            y
+          );
+
+
+          // Same orientation as the strand
+          rotate(
+            HALF_PI
+          );
+
 
           textFont(
             FONT_NAME
@@ -627,79 +1236,138 @@ function drawPoem() {
             FONT_SIZE
           );
 
-          fill(25);
+
+          fill(
+            20,
+            opacity
+          );
+
 
           noStroke();
 
 
           text(
             glyph.char,
-            x,
-            y
+            0,
+            0
           );
+
+
+          pop();
+
         }
       );
+
     }
   );
 }
 
 
 // ------------------------------------------------------
-// HOVER DETECTION + CURL STATE
+// HOVER
 // ------------------------------------------------------
 
-function updateHoverStates() {
+function updateHoverStates(
+  growth
+) {
 
-  poemLines.forEach(
-    (lineObj, index) => {
+  let t =
 
-      let y =
-        getLineY(index);
+    millis() *
+    0.001;
 
+
+  strands.forEach(
+    strand => {
 
       let hovering =
+        false;
 
-        mouseX >=
-        MARGIN_X - 15
 
-        &&
+      let visibleCount =
 
-        mouseX <=
-        MARGIN_X +
-        lineObj.width +
-        30
+        floor(
 
-        &&
+          strand.glyphs.length *
 
-        mouseY >=
-        y - 14
+          growth
+        );
 
-        &&
 
-        mouseY <=
-        y +
-        FONT_SIZE +
-        18;
+      // ------------------------------------------
+      // DETECT CURSOR AGAINST ORIGINAL STRAND PATH
+      // ------------------------------------------
+      //
+      // This intentionally uses the uncurlled path.
+      //
+      // Otherwise the strand could curl away from
+      // the cursor and immediately cancel itself.
+      //
+      // ------------------------------------------
+
+      for (
+        let i = 0;
+        i < visibleCount;
+        i += 3
+      ) {
+
+        let pos =
+
+          getBaseGlyphPosition(
+
+            strand,
+
+            i,
+
+            t
+          );
+
+
+        let cursorDistance =
+
+          dist(
+
+            mouseX,
+            mouseY,
+
+            pos.x,
+            pos.y
+          );
+
+
+        if (
+          cursorDistance <
+          30
+        ) {
+
+          hovering =
+            true;
+
+          break;
+        }
+      }
 
 
       // ------------------------------------------
       // HOVERING
       // ------------------------------------------
 
-      if (hovering) {
+      if (
+        hovering
+      ) {
 
         if (
-          lineObj.hoverStart ===
+          strand.hoverStart ===
           null
         ) {
 
-          lineObj.hoverStart =
+          strand.hoverStart =
             millis();
 
 
-          // randomize every new hover
+          // Random left/right direction
 
-          lineObj.curlDirection =
+          strand.curlDirection =
 
             random() < 0.5
 
@@ -708,150 +1376,159 @@ function updateHoverStates() {
               : 1;
 
 
-          lineObj.curlLoops =
+          // Slightly random curl severity
+
+          strand.curlAngle =
 
             random(
-              0.82,
-              1.02
-            );
 
+              CURL_ANGLE_MIN,
 
-          lineObj.curlRadius =
-
-            random(
-              55,
-              85
+              CURL_ANGLE_MAX
             );
         }
 
 
-        let hoverDuration =
+        let duration =
 
-          millis()
+          millis() -
 
-          -
-
-          lineObj.hoverStart;
+          strand.hoverStart;
 
 
-        // begin after 0.5 sec
         if (
-          hoverDuration >=
+          duration >=
           HOVER_DELAY
         ) {
 
-          lineObj.curlAmount =
+          // Faster / more dramatic response
+
+          strand.curlAmount =
 
             lerp(
-              lineObj.curlAmount,
+
+              strand.curlAmount,
+
               1,
-              0.055
+
+              0.075
             );
         }
 
 
       // ------------------------------------------
-      // CURSOR LEAVES
+      // LEAVE
       // ------------------------------------------
 
       } else {
 
-        lineObj.hoverStart =
+        strand.hoverStart =
           null;
 
 
-        // slowly relax
-        lineObj.curlAmount =
+        // Slow relaxation
+
+        strand.curlAmount =
 
           lerp(
-            lineObj.curlAmount,
+
+            strand.curlAmount,
+
             0,
-            0.015
+
+            0.010
           );
       }
 
 
       if (
-        lineObj.curlAmount <
+        strand.curlAmount <
         0.001
       ) {
 
-        lineObj.curlAmount =
+        strand.curlAmount =
           0;
       }
+
     }
   );
 }
 
 
 // ------------------------------------------------------
-// INPUT POSITION
-// ------------------------------------------------------
-
-function getInputY() {
-
-  return (
-
-    TOP_MARGIN
-
-    +
-
-    poemLines.length *
-    LINE_STEP
-
-    +
-
-    INPUT_MARGIN_TOP
-  );
-}
-
-
-// ------------------------------------------------------
-// DRAW INPUT BOX
+// INPUT BOX
 // ------------------------------------------------------
 
 function drawInputBox() {
 
-  let y =
-    getInputY();
-
-
   let boxWidth =
-    min(
-      width -
-      MARGIN_X * 2,
 
-      860
+    min(
+
+      INPUT_WIDTH,
+
+      width - 90
+
     );
 
 
+  let x =
+    45;
+
+
+  let y =
+
+    height -
+
+    INPUT_HEIGHT -
+
+    35;
+
+
+  // ------------------------------------------
   // BOX
+  // ------------------------------------------
 
   noFill();
 
+
   stroke(
+
     inputActive
+
       ? 25
+
       : 110
   );
 
+
   strokeWeight(
+
     inputActive
+
       ? 1.5
+
       : 1
   );
 
 
   rect(
-    MARGIN_X,
+
+    x,
+
     y,
+
     boxWidth,
+
     INPUT_HEIGHT,
+
     3
   );
 
 
+  // ------------------------------------------
   // LABEL
+  // ------------------------------------------
 
   noStroke();
 
@@ -863,18 +1540,18 @@ function drawInputBox() {
 
 
   text(
+
     "WRITE A WAY YOU ARE SAD",
-    MARGIN_X + 17,
+
+    x + 17,
+
     y + 12
   );
 
 
-  // USER TEXT
-
-  textSize(20);
-
-  fill(25);
-
+  // ------------------------------------------
+  // INPUT
+  // ------------------------------------------
 
   let displayText =
     currentInput;
@@ -885,35 +1562,51 @@ function drawInputBox() {
     cursorVisible
   ) {
 
-    displayText += "_";
+    displayText +=
+      "_";
   }
 
 
   if (
-    displayText.length === 0
+    displayText.length ===
+    0
   ) {
 
     fill(145);
 
     displayText =
       "click here and begin typing";
+
+  } else {
+
+    fill(25);
   }
 
 
+  textSize(18);
+
+
   text(
+
     displayText,
-    MARGIN_X + 17,
+
+    x + 17,
+
     y + 38,
+
     boxWidth - 34
   );
 
 
-  // COUNT
+  // ------------------------------------------
+  // COUNTER
+  // ------------------------------------------
 
   textAlign(
     RIGHT,
     TOP
   );
+
 
   textSize(10);
 
@@ -923,11 +1616,14 @@ function drawInputBox() {
   text(
 
     currentInput.length +
+
     " / " +
+
     MAX_CHARACTERS +
+
     "   ·   ENTER TO SUBMIT",
 
-    MARGIN_X +
+    x +
     boxWidth -
     15,
 
@@ -943,49 +1639,52 @@ function drawInputBox() {
 
 
 // ------------------------------------------------------
-// MOUSE CLICK
+// INPUT CLICK
 // ------------------------------------------------------
 
 function mousePressed() {
 
-  let y =
-    getInputY();
-
-
   let boxWidth =
-    min(
-      width -
-      MARGIN_X * 2,
 
-      860
+    min(
+
+      INPUT_WIDTH,
+
+      width - 90
+
     );
 
 
-  let insideInput =
+  let x =
+    45;
 
-    mouseX >=
-    MARGIN_X
+
+  let y =
+
+    height -
+
+    INPUT_HEIGHT -
+
+    35;
+
+
+  inputActive =
+
+    mouseX >= x
 
     &&
 
     mouseX <=
-    MARGIN_X +
-    boxWidth
+    x + boxWidth
 
     &&
 
-    mouseY >=
-    y
+    mouseY >= y
 
     &&
 
     mouseY <=
-    y +
-    INPUT_HEIGHT;
-
-
-  inputActive =
-    insideInput;
+    y + INPUT_HEIGHT;
 
 
   if (
@@ -998,7 +1697,7 @@ function mousePressed() {
 
 
 // ------------------------------------------------------
-// NORMAL CHARACTER INPUT
+// TYPE
 // ------------------------------------------------------
 
 function keyTyped() {
@@ -1012,12 +1711,15 @@ function keyTyped() {
 
 
   if (
-    key.length === 1
+
+    key.length ===
+    1
 
     &&
 
     currentInput.length <
     MAX_CHARACTERS
+
   ) {
 
     currentInput +=
@@ -1046,9 +1748,8 @@ function keyPressed() {
   }
 
 
-  // ENTER
-
   if (
+
     key === "Enter"
 
     ||
@@ -1058,6 +1759,7 @@ function keyPressed() {
     ||
 
     keyCode === RETURN
+
   ) {
 
     submitLine();
@@ -1065,8 +1767,6 @@ function keyPressed() {
     return false;
   }
 
-
-  // BACKSPACE
 
   if (
     key === "Backspace"
@@ -1088,29 +1788,77 @@ function keyPressed() {
 
 
 // ------------------------------------------------------
-// SUBMIT LINE
+// SUBMIT
 // ------------------------------------------------------
 
 function submitLine() {
 
   let clean =
+
     currentInput.trim();
 
 
   if (
-    clean.length === 0
+    clean.length ===
+    0
   ) {
 
     return;
   }
 
 
-  poemLines.push(
+  let index =
 
-    createPoemLine(
-      clean
-    )
-  );
+    floor(
+
+      random(
+        strands.length
+      )
+    );
+
+
+  let oldStrand =
+
+    strands[
+      index
+    ];
+
+
+  let newText =
+
+    oldStrand.text
+
+    +
+
+    " { "
+
+    +
+
+    clean;
+
+
+  let replacement =
+
+    createStrand(
+
+      newText,
+
+      index
+    );
+
+
+  // Preserve spatial placement
+
+  replacement.rootOffset =
+    oldStrand.rootOffset;
+
+
+  replacement.fanOffset =
+    oldStrand.fanOffset;
+
+
+  strands[index] =
+    replacement;
 
 
   currentInput =
@@ -1118,62 +1866,6 @@ function submitLine() {
 
 
   resetCursor();
-
-
-  updateCanvasHeight();
-
-
-  setTimeout(
-    () => {
-
-      window.scrollTo({
-
-        top:
-          document.body.scrollHeight,
-
-        behavior:
-          "smooth"
-      });
-
-    },
-
-    40
-  );
-}
-
-
-// ------------------------------------------------------
-// CANVAS HEIGHT
-// ------------------------------------------------------
-
-function updateCanvasHeight() {
-
-  let desiredHeight =
-
-    getInputY()
-
-    +
-
-    INPUT_HEIGHT
-
-    +
-
-    90;
-
-
-  if (
-    abs(
-      height -
-      desiredHeight
-    ) >
-    2
-  ) {
-
-    resizeCanvas(
-      width,
-      desiredHeight
-    );
-  }
 }
 
 
@@ -1191,6 +1883,7 @@ function updateCursor() {
     >
 
     CURSOR_BLINK_SPEED
+
   ) {
 
     cursorVisible =
